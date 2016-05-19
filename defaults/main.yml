@@ -1,0 +1,9 @@
+lambda_build_dir: "{{ playbook_dir }}/build"
+lambda_template_dir: "{{ lambda_build_dir }}"
+lambda_virtualenv_dir: "venv"
+lambda_virtualenv_site_packages: "{{ lambda_virtualenv_dir }}/lib/python2.7/site-packages"
+lambda_code_s3_key: "{{ lambda_code_zipfile | default(omit) }}"
+lambda_template_name: "{{ lambda_stack_name }}.json"
+lambda_handler_name: "handler"
+lambda_timeout: 3
+lambda_mem_size: 128
