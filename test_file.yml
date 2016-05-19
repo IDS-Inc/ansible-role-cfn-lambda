@@ -7,7 +7,6 @@
     lambda_region: us-west-2
     lambda_stack_name: lambda-role-file-test
     lambda_runtime: "python2.7"
-    lambda_source_code_file_contents: "{{ lookup('file', lambda_source_code_file) }}"
     lambda_role_policies:
       - name: test-policy
         actions:
