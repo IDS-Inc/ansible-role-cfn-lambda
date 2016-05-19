@@ -1,0 +1,121 @@
+{
+  "AWSTemplateFormatVersion" : "2010-09-09",
+  "Description" : "{{ lambda_stack_description | default('') }}",
+  "Parameters" : {
+    "FunctionName" : {
+      "Type" : "String"
+    },
+    "Description" : {
+      "Type" : "String"
+    },
+    "HandlerName" : {
+      "Type" : "String"
+    },
+    "Runtime" : {
+      "Type" : "String"
+    },
+    "Timeout" : {
+      "Type" : "Number"
+    },
+    "MemorySize" : {
+      "Type" : "Number"
+    }
+  },
+  "Resources" : {
+    "LambdaFunction" : {
+      "Type" : "AWS::Lambda::Function",
+      "Properties" : {
+        "Code" : {
+          {% if lambda_create_bundle is defined and lambda_create_bundle == 'yes' %}
+          "S3Bucket": "{{ lambda_code_s3_bucket }}",
+          "S3Key": "{{ lambda_code_s3_key }}"
+            {% if lambda_code_s3_object_version is defined %}
+            , "S3ObjectVersion": "{{ lambda_code_s3_object_version }}"
+            {% endif %}
+          {% elif lambda_source_code is defined or lambda_source_code_file is defined %}
+          "ZipFile" : {
+            {% if lambda_source_code_file_contents is defined %}
+            {% set lambda_source_code = lambda_source_code_file_contents.split('\n') %}
+            {% endif %}
+            "Fn::Join" : ["\n", [
+              {% for line in lambda_source_code  %}
+              "{{ line |  regex_replace('\"','\\\"') }}"
+              {% if not loop.last %}, {% endif %}
+              {% endfor %}
+            ]]
+          }
+          {% endif %}
+        },
+        "Description" : "{{ lambda_description | default('') }}",
+        "FunctionName" : { "Ref" : "FunctionName" },
+        "Handler" : { "Ref" : "HandlerName" },
+        "MemorySize" : { "Ref" : "MemorySize" },
+        "Role" : { "Fn::GetAtt" : [ "IAMRole", "Arn"] },
+        "Runtime" : { "Ref" : "Runtime" },
+        {% if lambda_use_vpc is defined %}
+        "VpcConfig" : {
+          "SecurityGroupIds" : [
+            {% for sg in lambda_security_group_ids %}
+            "{{ sg }}"
+            {% if not loop.last %}, {% endif %}
+            {% endfor %}
+          ],
+          "SubnetIds" : [
+            {% for subnet in lambda_subnet_ids %}
+            "{{ subnet }}"
+            {% if not loop.last %}, {% endif %}
+            {% endfor %}
+          ]
+        },
+        {% endif %}
+        "Timeout" : { "Ref" : "Timeout" }
+      }
+    },
+    "IAMRole" : {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        {% if lambda_role_path is defined %}
+        "Path": "{{ lambda_role_path }}",
+        {% endif %}
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": { "Service": "lambda.amazonaws.com" },
+              "Action": "sts:AssumeRole"
+            }
+          ]
+        },
+        {% if lambda_managed_policy_arns is defined %}
+        "ManagedPolicyArns": [
+          {% for arn in lambda_managed_policy_arns %}
+          "{{ arn }}"
+          {% if not loop.last %}, {% endif %}
+          {% endfor %}
+        ],
+        {% endif %}
+        "Policies": [
+          {% for policy in lambda_role_policies %}
+          {
+            "PolicyName" : "{{ policy.name }}",
+            "PolicyDocument" : {
+              "Statement" : {
+                "Effect": "{{ policy.effect }}",
+                "Action": [
+                  {% for action in policy.actions %}
+                  "{{ action }}"
+                  {% if not loop.last %}, {% endif %}
+                  {% endfor %}
+                ],
+                "Resource": "{{ policy.resource }}"
+              }
+            }
+          }
+          {% if not loop.last %}, {% endif %}
+          {% endfor %}
+        ]
+      }
+    }
+  }
+}

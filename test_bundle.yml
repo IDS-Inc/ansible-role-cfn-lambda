@@ -1,0 +1,28 @@
+- hosts: localhost
+  gather_facts: False
+  vars:
+    lambda_create_bundle: "yes"
+    lambda_virtualenv_dir: "testing"
+    lambda_security_token: "{{ lookup('env','AWS_SESSION_TOKEN') }}"
+    lambda_function_name: "{{ lambda_stack_name }}"
+    lambda_description: "test-lambda-bundle"
+    lambda_code_s3_bucket: "role-testing-bucket"
+    lambda_code_zipfile: "test.zip"
+    lambda_code_s3_object_version: "QDScRvyhIEdFM0i.AZLF8OANt.U6_vGy"
+    lambda_region: us-west-2
+    lambda_role_path: "/test/"
+    lambda_requirements:
+      - "{{ lambda_requirements_file }}"
+    lambda_stack_name: lambda-role-bundle-test
+    lambda_runtime: "python2.7"
+    lambda_requirements_file: "test_requirements.pip"
+    lambda_role_policies:
+      - name: test-policy
+        actions:
+          - "es:*"
+        effect: "Allow"
+        resource: "*"
+    lambda_tags:
+      test: "test"
+  roles:
+    - ./

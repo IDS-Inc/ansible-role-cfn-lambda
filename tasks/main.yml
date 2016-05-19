@@ -1,0 +1,94 @@
+- name: Create necessary directories
+  file:
+    state: directory
+    path: "{{ item }}"
+  with_items:
+    - "{{ lambda_build_dir }}"
+    - "{{ lambda_template_dir }}"
+
+- name: Test code
+  shell: ". {{ lambda_testing_script }}"
+  when: lambda_test_code is defined and lambda_test_code == 'yes'
+
+- name: Remove virtualenv dir
+  file:
+    state: absent
+    path: "{{ playbook_dir }}/{{ lambda_virtualenv_dir }}"
+  when: lambda_create_bundle is defined and lambda_create_bundle == 'yes'
+
+
+- name: Create virtualenv dir
+  file:
+    state: directory
+    path: "{{ playbook_dir }}/{{ lambda_virtualenv_dir }}"
+  when: lambda_create_bundle is defined and lambda_create_bundle == 'yes'
+
+
+- name: Copy files to virtualenv
+  command: "cp {{ item }} {{ playbook_dir }}/{{ lambda_virtualenv_dir }}/"
+  with_items: "{{ lambda_dependencies }}"
+  when: lambda_create_bundle is defined and lambda_create_bundle == 'yes' and lambda_dependencies is defined
+
+- name: Create virtualenv
+  pip:
+    virtualenv: "{{ playbook_dir }}/{{ lambda_virtualenv_dir }}"
+    requirements: "{{ playbook_dir }}/{{ lambda_virtualenv_dir }}/{{ lambda_requirements_file }}"
+  when: lambda_create_bundle is defined and lambda_create_bundle == 'yes'
+
+- name: Add lambda code to bundle
+  shell: "zip -9 {{ playbook_dir }}/{{ lambda_virtualenv_dir }}/{{ lambda_code_zipfile }} *"
+  args:
+    chdir: "{{ playbook_dir }}/{{ lambda_virtualenv_dir }}"
+  when: lambda_create_bundle is defined and lambda_create_bundle == 'yes'
+
+- name: Add dependent packages to bundle
+  shell: "zip -r9 {{ playbook_dir }}/{{ lambda_virtualenv_dir }}/{{ lambda_code_zipfile }} *"
+  args:
+    chdir: "{{ playbook_dir }}/{{ lambda_virtualenv_site_packages }}"
+  when: lambda_create_bundle is defined and lambda_create_bundle == 'yes'
+
+- name: Upload lambda function code
+  command: aws s3 cp {{ playbook_dir }}/{{ lambda_virtualenv_dir }}/{{ lambda_code_zipfile }} s3://{{ lambda_code_s3_bucket }}/{{ lambda_code_s3_key }}
+  when: lambda_create_bundle is defined and lambda_create_bundle == 'yes'
+
+- name: Remove virtualenv dir
+  file:
+    state: absent
+    path: "{{ lambda_virtualenv_dir }}"
+  when: lambda_create_bundle is defined and lambda_create_bundle == 'yes'
+
+- name: Template lambda function
+  template:
+    src: "lambda.json.j2"
+    dest: "{{ lambda_template_dir }}/{{ lambda_template_name }}"
+
+- name: Create lambda stack (security token)
+  cloudformation:
+    region: "{{ lambda_region }}"
+    template: "{{ lambda_template_dir }}/{{ lambda_template_name }}"
+    stack_name: "{{ lambda_stack_name }}"
+    template_parameters:
+      FunctionName: "{{ lambda_function_name }}"
+      Description: "{{ lambda_description }}"
+      HandlerName: "{{ lambda_handler_name }}"
+      Runtime: "{{ lambda_runtime }}"
+      Timeout: "{{ lambda_timeout }}"
+      MemorySize: "{{ lambda_mem_size }}"
+    tags: "{{ lambda_tags }}"
+    security_token: "{{ lambda_security_token }}"
+  when: lambda_security_token is defined
+
+- name: Create lambda stack (no security token)
+  cloudformation:
+    region: "{{ lambda_region }}"
+    template: "{{ lambda_template_dir }}/{{ lambda_template_name }}"
+    stack_name: "{{ lambda_stack_name }}"
+    template_parameters:
+      FunctionName: "{{ lambda_function_name }}"
+      Description: "{{ lambda_description }}"
+      HandlerName: "{{ lambda_handler_name }}"
+      Runtime: "{{ lambda_runtime }}"
+      Timeout: "{{ lambda_timeout }}"
+      MemorySize: "{{ lambda_mem_size }}"
+    tags: "{{ lambda_tags }}"
+  when: lambda_security_token is not defined
