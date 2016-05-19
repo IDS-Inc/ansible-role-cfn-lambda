@@ -6,6 +6,11 @@
     - "{{ lambda_build_dir }}"
     - "{{ lambda_template_dir }}"
 
+- name: Set source code file contents
+  set_fact:
+    lambda_source_code_file_contents: "{{ lookup('file',lambda_source_code_file )}}"
+  when: lambda_source_code_file is defined
+
 - name: Test code
   shell: ". {{ lambda_testing_script }}"
   when: lambda_test_code is defined and lambda_test_code == 'yes'
