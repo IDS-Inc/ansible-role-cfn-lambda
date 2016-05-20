@@ -7,3 +7,4 @@ lambda_template_name: "{{ lambda_stack_name }}.json"
 lambda_handler_name: "handler"
 lambda_timeout: 3
 lambda_mem_size: 128
+lambda_rule_state: "ENABLED"

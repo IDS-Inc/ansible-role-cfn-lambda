@@ -117,5 +117,78 @@
         ]
       }
     }
+    {% if lambda_cloudwatch_rules is defined %}
+    {% for rule in lambda_cloudwatch_rules %}
+    ,
+    "{{ rule.name }}": {
+      "Type": "AWS::Events::Rule",
+      "Properties": {
+        "Description": "{{ rule.description }}",
+        {% if rule.schedule is defined %}
+        "ScheduleExpression": "{{ rule.schedule }}",
+        {% elif rule.pattern is defined %}
+        "rulePattern" : {
+          {% if rule.pattern.version is defined %}
+          "version": "{{ rule.pattern.version }}",
+          {% endif %}
+          {% if rule.pattern.id is defined %}
+          "id": "{{ rule.pattern.id }}",
+          {% endif %}
+          {% if rule.pattern.detail_type is defined %}
+          "detail-type": ["{{ rule.pattern.detail_type }}"],
+          {% endif %}
+          {% if rule.pattern.account is defined %}
+          "account": "{{ rule.pattern.account }}",
+          {% endif %}
+          {% if rule.pattern.time is defined %}
+          "time": "{{ rule.pattern.time }}",
+          {% endif %}
+          {% if rule.pattern.region is defined %}
+          "region": "{{ rule.pattern.region }}",
+          {% endif %}
+          {% if rule.pattern.resources is defined %}
+          "resources": [
+            {% for resource in rule.pattern.resources %}
+            "{{ resource }}"
+            {% if not loop.last %}, {% endif %}
+            {% endfor %}
+          ],
+          {% endif %}
+          {% if rule.pattern.detail is defined %}
+          "detail": {
+            {% for key in rule.pattern.detail.keys() %}
+            "{{ key }}": ["{{ rule.pattern.detail[key] }}"]
+            {% if not loop.last %}, {% endif %}
+            {% endfor %}
+          },
+          {% endif %}
+          "source": [
+            {% for source in rule.pattern.sources %}
+            "{{ source }}"
+            {% if not loop.last %}, {% endif %}
+            {% endfor %}
+          ]
+        },
+        {% endif %}
+        "State": "{{ rule.state | default(lambda_rule_state) }}",
+        "Targets": [
+          {
+            "Arn": { "Fn::GetAtt": ["LambdaFunction", "Arn"] },
+            "Id": "LambdaFunction"
+          }
+        ]
+      }
+    },
+    "PermissionForEventsToInvokeLambda": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "FunctionName": { "Ref": "LambdaFunction" },
+        "Action": "lambda:InvokeFunction",
+        "Principal": "events.amazonaws.com",
+        "SourceArn": { "Fn::GetAtt": ["{{ rule.name }}", "Arn"] }
+      }
+    }
+    {% endfor %}
+    {% endif %}
   }
 }

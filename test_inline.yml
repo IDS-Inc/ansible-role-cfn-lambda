@@ -18,5 +18,11 @@
       - " print(\"Hello World!\")"
     lambda_tags:
       test: "test"
+    lambda_cloudwatch_rules:
+      - name: "BasicRule"
+        description: "BasicRule"
+        schedule: "rate(10 minutes)"
+        state: "ENABLED"
+
   roles:
     - ./
