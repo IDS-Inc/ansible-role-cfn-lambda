@@ -65,10 +65,10 @@
 - name: Template lambda function
   template:
     src: "lambda.json.j2"
-    dest: "{{ lambda_template_dir }}/{{ lambda_template_name }}"
+    dest: "{{ lambda_template_dir }}/{{ lambda_template_name }}-raw"
 
 - name: Clean up template
-  shell: "python -mjson.tool {{ lambda_template_dir }}/{{ lambda_template_name }} > clean"
+  shell: "python -mjson.tool {{ lambda_template_dir }}/{{ lambda_template_name }}-raw > {{ lambda_template_dir }}/{{ lambda_template_name }}"
 
 - name: Create lambda stack (security token)
   cloudformation:
