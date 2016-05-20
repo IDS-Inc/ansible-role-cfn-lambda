@@ -26,6 +26,7 @@
 | lambda_requirements_file | no | | Name of pip requirements file |
 | lambda_test_code | no |  | <strong>Yes specifies that a testing script should be run |
 | lambda_testing_script | conditional | | A script to test the lambda function prior to deployment (i.e. python-lambda-local). If <strong>lambda_test_code</strong> is set to <strong>yes</strong> this must be defined. |
+| lambda_cloudwatch_rules | no | | A list of CloudWatch Event Rules to execute the lambda. |
 
 
 ### lambda_role_policies Fields
@@ -35,6 +36,14 @@
 | actions | yes | | Actions granted / denied to the execution role. |
 | resource | yes | | Resource to grant access to. |
 | effect | yes | | Whether to <strong>Allow</strong> or <strong>Deny</strong> access to the role. |
+
+### lambda_cloudwatch_rules Fields
+| Variable        | Required           | Default  | Description |
+| ------------- |:--------------:| -----:| -------------------------------------------------------------------------:|
+| name | yes | | A basic name for the rule. |
+| description | yes | | A description for the rule. |
+| schedule | yes | | Schedule to use with the rule. |
+| state | no | ENABLED | State of the rule. |
 
 
 ## Example Playbooks
@@ -85,6 +94,11 @@
       - " print(\"Hello World!\")"
     lambda_tags:
       test: "test"
+    lambda_cloudwatch_rules:
+      - name: "BasicRule"
+        description: "BasicRule"
+        schedule: "rate(10 minutes)"
+        state: "ENABLED"
   roles:
     - lambda
 ```
