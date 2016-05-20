@@ -18,48 +18,48 @@
 - name: Remove virtualenv dir
   file:
     state: absent
-    path: "{{ playbook_dir }}/{{ lambda_virtualenv_dir }}"
+    path: "{{ lambda_build_dir }}/{{ lambda_virtualenv_dir }}"
   when: lambda_create_bundle is defined and lambda_create_bundle == 'yes'
 
 
 - name: Create virtualenv dir
   file:
     state: directory
-    path: "{{ playbook_dir }}/{{ lambda_virtualenv_dir }}"
+    path: "{{ lambda_build_dir }}/{{ lambda_virtualenv_dir }}"
   when: lambda_create_bundle is defined and lambda_create_bundle == 'yes'
 
 
 - name: Copy files to virtualenv
-  command: "cp {{ item }} {{ playbook_dir }}/{{ lambda_virtualenv_dir }}/"
+  command: "cp {{ item }} {{ lambda_build_dir }}/{{ lambda_virtualenv_dir }}/"
   with_items: "{{ lambda_dependencies }}"
   when: lambda_create_bundle is defined and lambda_create_bundle == 'yes' and lambda_dependencies is defined
 
 - name: Create virtualenv
   pip:
-    virtualenv: "{{ playbook_dir }}/{{ lambda_virtualenv_dir }}"
-    requirements: "{{ playbook_dir }}/{{ lambda_virtualenv_dir }}/{{ lambda_requirements_file }}"
+    virtualenv: "{{ lambda_build_dir }}/{{ lambda_virtualenv_dir }}"
+    requirements: "{{ lambda_build_dir }}/{{ lambda_virtualenv_dir }}/{{ lambda_requirements_file }}"
   when: lambda_create_bundle is defined and lambda_create_bundle == 'yes'
 
 - name: Add lambda code to bundle
-  shell: "zip -9 {{ playbook_dir }}/{{ lambda_virtualenv_dir }}/{{ lambda_code_zipfile }} *"
+  shell: "zip -9 {{ lambda_build_dir }}/{{ lambda_virtualenv_dir }}/{{ lambda_code_zipfile }} *"
   args:
-    chdir: "{{ playbook_dir }}/{{ lambda_virtualenv_dir }}"
+    chdir: "{{ lambda_build_dir }}/{{ lambda_virtualenv_dir }}"
   when: lambda_create_bundle is defined and lambda_create_bundle == 'yes'
 
 - name: Add dependent packages to bundle
-  shell: "zip -r9 {{ playbook_dir }}/{{ lambda_virtualenv_dir }}/{{ lambda_code_zipfile }} *"
+  shell: "zip -r9 {{ lambda_build_dir }}/{{ lambda_virtualenv_dir }}/{{ lambda_code_zipfile }} *"
   args:
-    chdir: "{{ playbook_dir }}/{{ lambda_virtualenv_site_packages }}"
+    chdir: "{{ lambda_virtualenv_site_packages }}"
   when: lambda_create_bundle is defined and lambda_create_bundle == 'yes'
 
 - name: Upload lambda function code
-  command: aws s3 cp {{ playbook_dir }}/{{ lambda_virtualenv_dir }}/{{ lambda_code_zipfile }} s3://{{ lambda_code_s3_bucket }}/{{ lambda_code_s3_key }}
+  command: aws s3 cp {{ lambda_build_dir }}/{{ lambda_virtualenv_dir }}/{{ lambda_code_zipfile }} s3://{{ lambda_code_s3_bucket }}/{{ lambda_code_s3_key }}
   when: lambda_create_bundle is defined and lambda_create_bundle == 'yes'
 
 - name: Remove virtualenv dir
   file:
     state: absent
-    path: "{{ lambda_virtualenv_dir }}"
+    path: "{{ lambda_build_dir }}/{{ lambda_virtualenv_dir }}"
   when: lambda_create_bundle is defined and lambda_create_bundle == 'yes'
 
 - name: Template lambda function

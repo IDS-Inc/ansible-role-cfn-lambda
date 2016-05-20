@@ -11,7 +11,7 @@
     lambda_code_s3_object_version: "QDScRvyhIEdFM0i.AZLF8OANt.U6_vGy"
     lambda_region: us-west-2
     lambda_role_path: "/test/"
-    lambda_requirements:
+    lambda_dependencies:
       - "{{ lambda_requirements_file }}"
     lambda_stack_name: lambda-role-bundle-test
     lambda_runtime: "python2.7"
