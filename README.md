@@ -11,6 +11,7 @@
 | lambda_role_policies | yes | | List of policies to apply to the lambda execution role. |
 | lambda_tags | yes | | List of tags to apply to the CloudFormation stack |
 | lambda_create_bundle | conditional | | If the lambda function has external dependencies, <strong>yes</strong> instructs role to package them in a virtual environment. Required if <strong>lambda_source_code</strong> and <strong>lambda_source_code_file</strong> are not defined. |
+| lambda_handler_name | conditional | | Name of the handler for the lambda function to use (i.e. lambda_function.handler, assuming python file is named lambda_function.py). If <strong>lambda_create_bundle</strong> is defined then a handler name is required. |
 | lambda_source_code | conditional | | Inline source code for lambda function. Required if <strong>lambda_source_code_file</strong> and <strong>lambda_create_bundle</strong> are not defined. |
 | lambda_source_code_file | conditional | | File containing the source code to use with the lambda function. Required if <strong>lambda_source_code</strong> and <strong>lambda_create_bundle</strong> are not defined. |
 | lambda_code_s3_bucket | conditional | | If deploying a packaged bundle to s3, use the this bucket. Required if creating bundle. |
