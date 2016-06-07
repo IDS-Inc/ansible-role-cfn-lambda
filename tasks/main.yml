@@ -70,11 +70,12 @@
 - name: Clean up template
   shell: "python -mjson.tool {{ lambda_template_dir }}/{{ lambda_template_name }}-raw > {{ lambda_template_dir }}/{{ lambda_template_name }}"
 
-- name: Create lambda stack
+- name: Create or Remove lambda stack
   cloudformation:
     region: "{{ lambda_region }}"
     template: "{{ lambda_template_dir }}/{{ lambda_template_name }}"
     stack_name: "{{ lambda_stack_name }}"
+    state: "{{ lambda_stack_state|default('present') }}"
     template_parameters:
       FunctionName: "{{ lambda_function_name }}"
       Description: "{{ lambda_description }}"
