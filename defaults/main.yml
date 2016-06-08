@@ -8,4 +8,4 @@ lambda_handler_name: "handler"
 lambda_timeout: 3
 lambda_mem_size: 128
 lambda_rule_state: "ENABLED"
-lambda_stack_name: "{{ lambda-function-name }}-lambda-function"
+lambda_stack_name: "{{ lambda_function_name }}-lambda-function"
