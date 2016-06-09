@@ -123,10 +123,33 @@
                   {% if not loop.last %}, {% endif %}
                   {% endfor %}
                 ],
+                {% if policy.conditions is defined %}
+                "Condition" : {
+                  {% for condition in policy.conditions %}
+                  "{{ condition.condition }}" : {
+                    {% for clause in condition.clauses %}
+                      "{{ clause.clause }}" : [
+                        {% for key in clause.keys %}
+                          "{{ key.key }}" : [
+                            {% for value in key.values %}
+                            "{{ value }}"
+                            {% if not loop.last %}, {% endif %}
+                            {% endfor %}
+                          ]
+                        {% if not loop.last %}, {% endif %}
+                        {% endfor %}                      ]
+                    {% if not loop.last %}, {% endif %}
+                    {% endfor %}
+                  }
+                  {% if not loop.last %}, {% endif %}
+                  {% endfor %}
+                },
+                {% endif %}
                 "Resource": "{{ policy.resource }}"
               }
             }
           }
+          {% if not loop.last %}, {% endif %}
           {% endfor %}
         ]
       }
