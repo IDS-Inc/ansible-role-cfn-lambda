@@ -1,4 +1,5 @@
 lambda_build_dir: "{{ playbook_dir }}/build"
+lambda_function_name: ""
 lambda_template_dir: "{{ lambda_build_dir }}"
 lambda_virtualenv_dir: "venv"
 lambda_virtualenv_site_packages: "{{ lambda_build_dir }}/{{ lambda_virtualenv_dir }}/lib/python2.7/site-packages"

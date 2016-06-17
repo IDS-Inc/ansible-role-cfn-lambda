@@ -1,0 +1,28 @@
+- name: test creation of inline based lambda function definition w/o name
+  hosts: test
+  gather_facts: False
+  vars:
+    lambda_security_token: "{{ lookup('env','AWS_SESSION_TOKEN') }}"
+    lambda_description: "test-lambda"
+    lambda_region: us-west-2
+    lambda_stack_name: lambda-role-inline-test-noname
+    lambda_runtime: "python2.7"
+    lambda_role_policies:
+      - name: test-policy
+        actions:
+          - "es:*"
+        effect: "Allow"
+        resource: "*"
+    lambda_source_code:
+      - "def handler(event, context):"
+      - " print(\"Hello World!\")"
+    lambda_tags:
+      test: "test"
+    lambda_cloudwatch_rules:
+      - name: "BasicRule"
+        description: "BasicRule"
+        schedule: "rate(10 minutes)"
+        state: "ENABLED"
+
+  roles:
+    - ansible-role-cfn-lambda

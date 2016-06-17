@@ -1,4 +1,4 @@
-- hosts: localhost
+- hosts: test
   gather_facts: False
   vars:
     lambda_create_bundle: "yes"
@@ -25,4 +25,4 @@
     lambda_tags:
       test: "test"
   roles:
-    - ./
+    - ansible-role-cfn-lambda

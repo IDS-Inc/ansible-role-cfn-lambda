@@ -47,7 +47,7 @@
           {% endif %}
         },
         "Description" : "{{ lambda_description | default('') }}",
-        "FunctionName" : { "Ref" : "FunctionName" },
+        {% if lambda_function_name != '' %}"FunctionName" : { "Ref" : "FunctionName" },{% endif %}
         "Handler" : { "Ref" : "HandlerName" },
         "MemorySize" : { "Ref" : "MemorySize" },
         "Role" : { "Fn::GetAtt" : [ "IAMRole", "Arn"] },
@@ -227,5 +227,10 @@
     }
     {% endfor %}
     {% endif %}
+  },
+  "Outputs" : {
+    "FunctionName" : { "Value": { "Ref": "LambdaFunction" }, "Description": "Name of the function" },
+    "RoleName" : { "Value": { "Ref": "IAMRole" }, "Description": "Name of the created role" },
+    "FunctionArn" : { "Value": { "Fn::GetAtt" : [ "LambdaFunction", "Arn" ] } }
   }
 }
