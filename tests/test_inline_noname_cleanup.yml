@@ -1,12 +1,13 @@
-- hosts: localhost
+- name: test cleanup of inline based lambda function definition w/o name
+  hosts: test
   gather_facts: False
   vars:
     lambda_security_token: "{{ lookup('env','AWS_SESSION_TOKEN') }}"
-    lambda_function_name: "{{ lambda_stack_name }}"
     lambda_description: "test-lambda"
     lambda_region: us-west-2
-    lambda_stack_name: lambda-role-inline-test
+    lambda_stack_name: lambda-role-inline-test-noname
     lambda_runtime: "python2.7"
+    lambda_stack_state: "absent"
     lambda_role_policies:
       - name: test-policy
         actions:
@@ -25,4 +26,4 @@
         state: "ENABLED"
 
   roles:
-    - ./
+    - ansible-role-cfn-lambda

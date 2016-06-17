@@ -1,4 +1,5 @@
-- hosts: localhost
+- name: test creation of file based lambda function definition w/ name
+  hosts: test
   gather_facts: False
   vars:
     lambda_security_token: "{{ lookup('env','AWS_SESSION_TOKEN') }}"
@@ -17,4 +18,4 @@
     lambda_tags:
       test: "test"
   roles:
-    - ./
+    - ansible-role-cfn-lambda

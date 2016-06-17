@@ -1,0 +1,22 @@
+- name: test cleanup of file based lambda function definition w/ name
+  hosts: test
+  gather_facts: False
+  vars:
+    lambda_security_token: "{{ lookup('env','AWS_SESSION_TOKEN') }}"
+    lambda_function_name: "{{ lambda_stack_name }}"
+    lambda_description: "test-lambda"
+    lambda_region: us-west-2
+    lambda_stack_name: lambda-role-file-test
+    lambda_stack_state: "absent"
+    lambda_runtime: "python2.7"
+    lambda_role_policies:
+      - name: test-policy
+        actions:
+          - "es:*"
+        effect: "Allow"
+        resource: "*"
+    lambda_source_code_file: "test_function.py"
+    lambda_tags:
+      test: "test"
+  roles:
+    - ansible-role-cfn-lambda
