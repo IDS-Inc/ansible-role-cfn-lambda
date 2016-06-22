@@ -227,6 +227,16 @@
     }
     {% endfor %}
     {% endif %}
+    {% if lambda_permissions is defined %}
+    ,
+    {% for permission in lambda_permissions %}
+    "{{ permission.name }}" : {
+      "Type" : "AWS::Lambda::Permission",
+      "Properties" : {{ permission.properties | to_json }}
+    }
+    {% if not loop.last %}, {% endif %}
+    {% endfor %}
+    {% endif %}
   },
   "Outputs" : {
     "FunctionName" : { "Value": { "Ref": "LambdaFunction" }, "Description": "Name of the function" },
