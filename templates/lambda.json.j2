@@ -164,7 +164,7 @@
         {% if rule.schedule is defined %}
         "ScheduleExpression": "{{ rule.schedule }}",
         {% elif rule.pattern is defined %}
-        "rulePattern" : {
+        "EventPattern" : {
           {% if rule.pattern.version is defined %}
           "version": "{{ rule.pattern.version }}",
           {% endif %}
