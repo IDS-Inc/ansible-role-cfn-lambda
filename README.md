@@ -22,7 +22,7 @@
 | lambda_virtualenv_dir | no | "venv" | Name of virtual environment into which to build function package. |
 | lambda_security_token | no | | If a security token is used for the deployment, define it here. |
 | lamdda_code_s3_object_version | no | | Version of s3 object for lambda function bundle to use. |
-| lambda_role_path | no | | If desired, path to use for the lambda execution role. |
+| lambda_iam_role_arn | yes | | ARN of the role to use with the lambda function. |
 | lambda_dependencies | no | | If deploying a packaged bundle to s3, list of files that need to be included in the bundle |
 | lambda_requirements_file | no | | Name of pip requirements file |
 | lambda_test_code | no |  | <strong>Yes specifies that a testing script should be run |

@@ -83,6 +83,7 @@
       Runtime: "{{ lambda_runtime }}"
       Timeout: "{{ lambda_timeout }}"
       MemorySize: "{{ lambda_mem_size }}"
+      IAMRoleArn: "{{ lambda_iam_role_arn }}"
     tags: "{{ lambda_tags }}"
     security_token: "{{ lookup('env','AWS_SESSION_TOKEN')|default(omit, true) }}"
   register: lambda_stack_output
