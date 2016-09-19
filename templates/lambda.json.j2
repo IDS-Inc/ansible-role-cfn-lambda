@@ -19,6 +19,9 @@
     },
     "MemorySize" : {
       "Type" : "Number"
+    },
+    "IAMRoleArn" : {
+      "Type" : "String"
     }
   },
   "Resources" : {
@@ -50,7 +53,7 @@
         {% if lambda_function_name != '' %}"FunctionName" : { "Ref" : "FunctionName" },{% endif %}
         "Handler" : { "Ref" : "HandlerName" },
         "MemorySize" : { "Ref" : "MemorySize" },
-        "Role" : { "Fn::GetAtt" : [ "IAMRole", "Arn"] },
+        "Role" : { "Ref" : "IAMRoleArn" },
         "Runtime" : { "Ref" : "Runtime" },
         {% if lambda_use_vpc is defined %}
         "VpcConfig" : {
@@ -69,89 +72,6 @@
         },
         {% endif %}
         "Timeout" : { "Ref" : "Timeout" }
-      }
-    },
-    "IAMRole" : {
-      "Type": "AWS::IAM::Role",
-      "Properties": {
-        {% if lambda_role_path is defined %}
-        "Path": "{{ lambda_role_path }}",
-        {% endif %}
-        "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17",
-          "Statement": [
-            {
-              "Effect": "Allow",
-              "Principal": { "Service": "lambda.amazonaws.com" },
-              "Action": "sts:AssumeRole"
-            }
-          ]
-        },
-        {% if lambda_managed_policy_arns is defined %}
-        "ManagedPolicyArns": [
-          {% for arn in lambda_managed_policy_arns %}
-          "{{ arn }}"
-          {% if not loop.last %}, {% endif %}
-          {% endfor %}
-        ],
-        {% endif %}
-        "Policies": [
-          {
-            "PolicyName" : "CloudWatchLogsAccess",
-            "PolicyDocument" : {
-              "Statement" : {
-                "Action": [
-                    "logs:CreateLogGroup",
-                    "logs:CreateLogStream",
-                    "logs:PutLogEvents"
-                ],
-                "Resource": "arn:aws:logs:*:*:*",
-                "Effect": "Allow"
-              }
-            }
-          },
-
-          {% for policy in lambda_role_policies %}
-          {
-            "PolicyName" : "{{ policy.name }}",
-            "PolicyDocument" : {
-              "Statement" : {
-                "Effect": "{{ policy.effect }}",
-                "Action": [
-                  {% for action in policy.actions %}
-                  "{{ action }}"
-                  {% if not loop.last %}, {% endif %}
-                  {% endfor %}
-                ],
-                {% if policy.conditions is defined %}
-                "Condition" : {
-                  {% for condition in policy.conditions %}
-                  "{{ condition.condition }}" : {
-                    {% for clause in condition.clauses %}
-                      "{{ clause.clause }}" : [
-                        {% for key in clause.keys %}
-                          "{{ key.key }}" : [
-                            {% for value in key.values %}
-                            "{{ value }}"
-                            {% if not loop.last %}, {% endif %}
-                            {% endfor %}
-                          ]
-                        {% if not loop.last %}, {% endif %}
-                        {% endfor %}                      ]
-                    {% if not loop.last %}, {% endif %}
-                    {% endfor %}
-                  }
-                  {% if not loop.last %}, {% endif %}
-                  {% endfor %}
-                },
-                {% endif %}
-                "Resource": "{{ policy.resource }}"
-              }
-            }
-          }
-          {% if not loop.last %}, {% endif %}
-          {% endfor %}
-        ]
       }
     }
     {% if lambda_cloudwatch_rules is defined %}
@@ -240,7 +160,6 @@
   },
   "Outputs" : {
     "FunctionName" : { "Value": { "Ref": "LambdaFunction" }, "Description": "Name of the function" },
-    "RoleName" : { "Value": { "Ref": "IAMRole" }, "Description": "Name of the created role" },
     "FunctionArn" : { "Value": { "Fn::GetAtt" : [ "LambdaFunction", "Arn" ] } }
   }
 }
