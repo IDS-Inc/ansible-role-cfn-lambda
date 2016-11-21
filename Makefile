@@ -25,7 +25,7 @@ ADD . /tmp/playbook/roles/$$TEST_LABEL
 WORKDIR /tmp/playbook
 RUN pip install -r test_requirements.pip && \\
     ansible-galaxy install -r requirements.yml -p ./roles && \\
-    ansible-playbook $$ANSIBLE_OPTIONS -i inventory test.yml
+    ansible-playbook $$ANSIBLE_OPTIONS -i inventory test.yml -e lambda_iam_role_arn=${LAMBDA_IAM_ROLE_ARN} -e lambda_kms_key_arn=${LAMBDA_KMS_KEY_ARN}
 endef
 export DOCKER_BODY
 

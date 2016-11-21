@@ -1,8 +1,12 @@
 - include: test_file.yml
-- include: test_inline.yml 
+- include: test_inline.yml
+- include: test_environment.yml
 - include: test_inline_noname.yml
+- include: test_environment.yml
 - include: test_add_permissions.yml
 - include: test_file_cleanup.yml
 - include: test_inline_cleanup.yml
-- include: test_inline_noname_cleanup.yml 
+- include: test_environment_cleanup.yml
+- include: test_inline_noname_cleanup.yml
 - include: test_add_permissions_cleanup.yml
+- include: test_environment_cleanup.yml
