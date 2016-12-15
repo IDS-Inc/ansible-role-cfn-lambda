@@ -9,8 +9,9 @@ RUN apt-get update && apt-get install -y \\
       python-dev \\
       python-pip \\
       libffi-dev \\
-      libssl-dev && \\
-    pip install -U distribute boto ansible==2.1.0 
+      libssl-dev \\
+			zip && \\
+    pip install -U distribute boto ansible==2.1.0 virtualenv awscli
     # ansible 2.1.0 fail: https://github.com/ansible/ansible/issues/16015
 ARG ANSIBLE_OPTIONS
 ARG TEST_LABEL
@@ -25,7 +26,7 @@ ADD . /tmp/playbook/roles/$$TEST_LABEL
 WORKDIR /tmp/playbook
 RUN pip install -r test_requirements.pip && \\
     ansible-galaxy install -r requirements.yml -p ./roles && \\
-    ansible-playbook $$ANSIBLE_OPTIONS -i inventory test.yml -e lambda_iam_role_arn=${LAMBDA_IAM_ROLE_ARN} -e lambda_kms_key_arn=${LAMBDA_KMS_KEY_ARN}
+    ansible-playbook $$ANSIBLE_OPTIONS -i inventory test.yml -e lambda_iam_role_arn=${LAMBDA_IAM_ROLE_ARN} -e lambda_kms_key_arn=${LAMBDA_KMS_KEY_ARN} -e lambda_do_deploy=yes -e lambda_code_s3_bucket=${LAMBDA_CODE_S3_BUCKET}
 endef
 export DOCKER_BODY
 

@@ -10,3 +10,8 @@ lambda_timeout: 3
 lambda_mem_size: 128
 lambda_rule_state: "ENABLED"
 lambda_stack_name: "{{ lambda_function_name }}-lambda-function"
+lambda_security_token: "{{ lookup('env','AWS_SESSION_TOKEN')|default(omit, true) }}"
+lambda_do_deploy: "yes"
+lambda_pin_to_s3_version: "no"
+lambda_create_bundle: "no"
+lambda_code_use_s3_bundle: "{{ lambda_create_bundle }}"

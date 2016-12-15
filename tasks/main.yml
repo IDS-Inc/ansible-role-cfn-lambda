@@ -88,3 +88,4 @@
     tags: "{{ lambda_tags }}"
     security_token: "{{ lookup('env','AWS_SESSION_TOKEN')|default(omit, true) }}"
   register: lambda_stack_output
+  when: lambda_do_deploy == 'yes'
