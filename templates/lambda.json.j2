@@ -32,7 +32,7 @@
       "Type" : "AWS::Lambda::Function",
       "Properties" : {
         "Code" : {
-          {% if lambda_create_bundle is defined and lambda_create_bundle == 'yes' %}
+          {% if lambda_code_use_s3_bundle is defined and lambda_code_use_s3_bundle == 'yes' %}
           "S3Bucket": "{{ lambda_code_s3_bucket }}",
           "S3Key": "{{ lambda_code_s3_key }}"
             {% if lambda_code_s3_object_version is defined %}

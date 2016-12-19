@@ -2,6 +2,7 @@
   gather_facts: False
   vars:
     lambda_create_bundle: "yes"
+    lambda_stack_state: "absent"
     lambda_virtualenv_dir: "testing"
     lambda_security_token: "{{ lookup('env','AWS_SESSION_TOKEN') }}"
     lambda_function_name: "{{ lambda_stack_name }}"
@@ -9,7 +10,6 @@
     lambda_code_zipfile: "test.zip"
     lambda_region: us-west-2
     lambda_role_path: "/test/"
-    lambda_code_s3_key: "testing/{{ lambda_code_zipfile }}"
     lambda_dependencies:
       - "{{ lambda_requirements_file }}"
     lambda_stack_name: lambda-role-bundle-test
@@ -25,3 +25,5 @@
       test: "test"
   roles:
     - ansible-role-cfn-lambda
+  post_tasks:
+    - shell: "aws s3api delete-object --bucket {{ lambda_code_s3_bucket }} --key {{ lambda_code_s3_key }}"

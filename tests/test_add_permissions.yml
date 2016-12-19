@@ -1,11 +1,12 @@
-- hosts: localhost
-  connection: local
+- name: test add permissions
+  hosts: test
+  gather_facts: False
   vars:
     lambda_security_token: "{{ lookup('env','AWS_SESSION_TOKEN') }}"
     lambda_function_name: "{{ lambda_stack_name }}"
     lambda_description: "test-lambda"
     lambda_region: us-west-2
-    lambda_stack_name: lambda-role-add-permissions-test
+    lambda_stack_name: "lambda-role-add-permissions-test"
     lambda_runtime: "python2.7"
     lambda_role_policies:
       - name: test-policy
@@ -25,13 +26,11 @@
         state: "ENABLED"
     lambda_permissions:
         - name: "atnoeu"
-          properties: 
+          properties:
             "SourceArn": "arn:aws:sns:us-west-2:209983464176:testtopic"
             "Action": "lambda:invokeFunction"
             "Principal": "sns.amazonaws.com"
             "FunctionName": { "Ref" : "LambdaFunction" }
-  pre_tasks:
-    - shell: "echo AOEUOEUUOAEUAO"
 
   roles:
     - role: ./
