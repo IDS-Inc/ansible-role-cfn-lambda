@@ -36,7 +36,7 @@ export DOCKER_BODY
 .PHONY: default
 default: test16
 
-testv%: ANSIBLE_OPTIONS = -v
+testv%: ANSIBLE_OPTIONS = -vvvv
 test%:
 	( echo 'FROM ${PLATFORM}:${TEST_TAG}' ) > tests/Dockerfile.${PLATFORM}.${TEST_TAG}
 	echo "$$DOCKER_BODY" >> tests/Dockerfile.${PLATFORM}.${TEST_TAG}

@@ -25,7 +25,13 @@
     },
     "KmsKeyArn" :{
       "Type" : "String"
+    },
+    "DeadLetterArn":{
+      "Type" : "String"
     }
+  },
+  "Conditions": {
+    "UseDeadLetterArn": { "Fn::Not": [ { "Fn::Equals": [ "", { "Ref" : "DeadLetterArn" } ]}] }
   },
   "Resources" : {
     "LambdaFunction" : {
@@ -51,6 +57,15 @@
             ]]
           }
           {% endif %}
+        },
+        "DeadLetterConfig": {
+          "DeadLetternArn": {
+            "Fn::If" : [
+              "UseDeadLetterArn",
+              { "Ref": "DeadLetterArn" },
+              { "Ref" : "AWS::NoValue" }
+            ]
+          }
         },
         "Description" : "{{ lambda_description | default('') }}",
         {% if lambda_function_name != '' %}"FunctionName" : { "Ref" : "FunctionName" },{% endif %}
