@@ -59,7 +59,7 @@
           {% endif %}
         },
         "DeadLetterConfig": {
-          "DeadLetternArn": {
+          "TargetArn": {
             "Fn::If" : [
               "UseDeadLetterArn",
               { "Ref": "DeadLetterArn" },
